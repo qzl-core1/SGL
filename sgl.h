@@ -26,7 +26,7 @@
 
 #define SGL_SCREEN_SIZE SGL_SCREEN_H*SGL_SCREEN_W/8
 
-#define DEBUG_ENABLE 0//开启日志打印功能,1则开启,在32行的宏替换中加入自己printf函数
+#define DEBUG_ENABLE 1//开启日志打印功能,1则开启,在32行的宏替换中加入自己printf函数
 
 #if DEBUG_ENABLE
 #define log_printf debug_printf

@@ -308,7 +308,7 @@ void sgl_draw_font(int16_t x,int16_t y,int16_t font_height,int16_t font_width,ui
             for(j = 0;j < font_height ; j++)
             {
                 if(tmp&0x01) sgl_draw_pixel(x0,y0,1);
-                else sgl_draw_pixel(x0,y0,0);
+//                else sgl_draw_pixel(x0,y0,0);
                 tmp >>= 1;
                 y0++;
             }
@@ -335,7 +335,7 @@ void sgl_draw_font(int16_t x,int16_t y,int16_t font_height,int16_t font_width,ui
                 for(m = 0;m < height_count;m++)
                 {
                     if(tmp&0x01) sgl_draw_pixel(x0,y0,1);
-                    else sgl_draw_pixel(x0,y0,0);
+//                    else sgl_draw_pixel(x0,y0,0);
                     tmp >>= 1;
                     y0++;
                 }
@@ -383,7 +383,7 @@ void sgl_draw_bmp(int16_t x, int16_t y, int16_t bmp_height,int16_t bmp_width , u
             for(m = 0;m < height_count;m++)
             {
                 if(tmp&0x01) sgl_draw_pixel(x0,y0,1);
-                else sgl_draw_pixel(x0,y0,0);
+//                else sgl_draw_pixel(x0,y0,0);
                 tmp >>= 1;
                 y0++;
             }
