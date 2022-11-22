@@ -11,7 +11,7 @@ int16_t sgl_x_end;
 int16_t sgl_y_end;
 
 /* 设置当前显存的地址 */
-void sgl_set_gram(uint8_t* gram, int16_t start_x, int16_t start_y, int16_t end_x, int16_t end_y)
+inline void sgl_set_gram(uint8_t* gram, int16_t start_x, int16_t start_y, int16_t end_x, int16_t end_y)
 {
     sgl_draw_gram = gram;//拿到新的显存块
 
@@ -428,12 +428,13 @@ void sgl_draw_bmp(int16_t x, int16_t y, int16_t father_x, int16_t father_y, int1
 {
     int x0 = x, y0 = y;
     int i, j;
-#if Color_depth == 1
+    #if Color_depth == 1
     int m = 0;
     uint8_t tmp;
     int height_tmp = 0;
     int height_byte = (bmp_height - 1) / 8 + 1; //获取高度所站的字节数
     int height_count = 0;
+
     for(i = 0; i < bmp_width; i++)
     {
         height_tmp = bmp_height;
@@ -459,22 +460,26 @@ void sgl_draw_bmp(int16_t x, int16_t y, int16_t father_x, int16_t father_y, int1
         x0++;
         y0 = y;//一个列全部扫描完毕,回到最初行
     }
-#endif
-#if Color_depth == 16
+
+    #endif
+    #if Color_depth == 16
     uint16_t tmp_16;
     uint32_t pos = 0;
+
     for(i = 0; i < bmp_height; i++)
     {
         for(j = 0 ; j < bmp_width ; j++)//每次把一个列对应的全部绘制
         {
-            pos = i*bmp_width*2+j*2;
-            tmp_16 = ((uint16_t)bmp_src[pos])<<8;
-            tmp_16 = tmp_16|((uint16_t)bmp_src[pos+1]);
-            sgl_draw_pixel(x0,y0,father_x,father_y,father_width,father_height,tmp_16);
+            pos = i * bmp_width * 2 + j * 2;
+            tmp_16 = ((uint16_t)bmp_src[pos]) << 8;
+            tmp_16 = tmp_16 | ((uint16_t)bmp_src[pos + 1]);
+            sgl_draw_pixel(x0, y0, father_x, father_y, father_width, father_height, tmp_16);
             x0++;
         }
+
         x0 = x;
         y0++;
     }
-#endif
+
+    #endif
 }

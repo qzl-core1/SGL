@@ -2,7 +2,7 @@
 
 static sgl_anim_t sgl_anim_root;//动画根节点
 static uint16_t sgl_anim_sum;//动画总数
-static uint32_t sgl_anim_stamp;
+static uint32_t sgl_anim_stamp;//动画时间戳
 
 static float animate_fx(float t)
 {
@@ -13,18 +13,39 @@ static float animate_fx(float t)
         return(4 * (t - 1) * (t - 1) * (t - 1) + 1);
 }
 
+/* 动画函数时间戳 */
+static uint32_t sgl_anim_tick_stampe_interval(uint32_t pre_tick)
+{
+    uint32_t tick = sgl_get_Timestamp();
+
+    if(tick >= pre_tick)
+    {
+        pre_tick = tick - pre_tick;
+    }
+    else
+    {
+        pre_tick = 0xffffffff - pre_tick + 1;
+        pre_tick += tick;
+        pre_tick = ~pre_tick;
+    }
+
+    return pre_tick;
+}
+
 /* 动画模块初始化 */
 void sgl_anim_init(void)
 {
     memset(&sgl_anim_root, 0, sizeof(sgl_anim_t));
     sgl_anim_root.next_anim = NULL;
-    sgl_anim_root.animi_obj_callback = NULL;
+    sgl_anim_root.anim_obj_callback = NULL;
+    sgl_anim_root.anim_tim_callbaclk = NULL;
+    sgl_anim_root.anim_end_callback = NULL;
     sgl_anim_root.obj = NULL;
     sgl_anim_stamp = sgl_get_Timestamp();
 }
 
 /* 动画创造函数 */
-sgl_anim_t* sgl_anim_create(void* obj, float start_value, float end_value, uint32_t duration, void (*animi_obj_callback)(void*, float), float (*anim_tim_callbaclk)(float))
+sgl_anim_t* sgl_anim_create(void* obj, float start_value, float end_value, uint32_t duration, void (*anim_obj_callback)(void*, float), float (*anim_tim_callbaclk)(float), void (*anim_end_callbak)(void*))
 {
     if(obj == NULL)//绑定对象为空
     {
@@ -34,7 +55,7 @@ sgl_anim_t* sgl_anim_create(void* obj, float start_value, float end_value, uint3
         return NULL;
     }
 
-    if(animi_obj_callback == NULL)//作用于对象的回调函数为空
+    if(anim_obj_callback == NULL)//作用于对象的回调函数为空
     {
         #if DEBUG_ENABLE
         sgl_log("the anim have not animi_callback-----sgl_anim_create\r\n");
@@ -50,7 +71,7 @@ sgl_anim_t* sgl_anim_create(void* obj, float start_value, float end_value, uint3
         duration = 1;
     }
 
-    sgl_anim_t* anim = (sgl_anim_t*)sig_malloc(sizeof(sgl_anim_t));//内存申请
+    sgl_anim_t* anim = (sgl_anim_t*)sgl_malloc(sizeof(sgl_anim_t));//内存申请
 
     if(anim == NULL)
     {
@@ -65,7 +86,8 @@ sgl_anim_t* sgl_anim_create(void* obj, float start_value, float end_value, uint3
     /* 初始化内存值 */
     anim->obj = obj;
     anim->duration = duration;
-    anim->animi_obj_callback = animi_obj_callback;
+    anim->anim_obj_callback = anim_obj_callback;
+    anim->anim_end_callback = anim_end_callbak;
 
     if(anim_tim_callbaclk == NULL)//如果时间回调函数为空
     {
@@ -93,7 +115,7 @@ sgl_anim_t* sgl_anim_create(void* obj, float start_value, float end_value, uint3
     return anim;
 }
 
-void sgl_anim_remove(sgl_anim_t* anim)
+static void sgl_anim_remove(sgl_anim_t* anim)
 {
     if(anim == NULL)
     {
@@ -111,7 +133,7 @@ void sgl_anim_remove(sgl_anim_t* anim)
         if(p_anim == anim)
         {
             p_anim_pre->next_anim = p_anim->next_anim;
-            sig_free(p_anim);//释放内存
+            sgl_free(p_anim);//释放内存
             sgl_anim_sum--;
             return;//退出函数
         }
@@ -121,24 +143,11 @@ void sgl_anim_remove(sgl_anim_t* anim)
     }
 }
 
-/* 动画函数时间戳 */
-static uint32_t sgl_anim_tick_stampe_interval(uint32_t pre_tick)
+int sgl_anim_get_sum(void)
 {
-    uint32_t tick = sgl_get_Timestamp();
-
-    if(tick >= pre_tick)
-    {
-        pre_tick = tick - pre_tick;
-    }
-    else
-    {
-        pre_tick = 0xffffffff - pre_tick + 1;
-        pre_tick += tick;
-        pre_tick = ~pre_tick;
-    }
-
-    return pre_tick;
+    return sgl_anim_sum;
 }
+
 
 void sgl_anim_run(void)
 {
@@ -163,11 +172,16 @@ void sgl_anim_run(void)
 
         p_anim->now_value = p_anim->start_value + p * p_anim->distance; //计算
 
-        p_anim->animi_obj_callback(p_anim->obj, p_anim->now_value); //将值传递给对象
+        p_anim->anim_obj_callback(p_anim->obj, p_anim->now_value); //将值传递给对象
 
 
         if(p_anim->act_time == p_anim->duration)//持续时间到了,移除动画
         {
+            if(p_anim->anim_end_callback != NULL)//动画有结束回调
+            {
+                p_anim->anim_end_callback(p_anim->obj);
+            }
+
             p_anim_tmp = (sgl_anim_t*)p_anim->next_anim;
             sgl_anim_remove(p_anim);
             p_anim = p_anim_tmp;

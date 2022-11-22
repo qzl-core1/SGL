@@ -11,6 +11,7 @@
 #include "sgl_core/sgl_driver.h"
 #include "sgl_core/sgl_draw.h"
 #include "sgl_core/sgl_anim.h"
+#include "sgl_core/sgl_timer.h"
 
 /* 这里属于用户头文件区域 */
 #include "debug.h"
@@ -21,19 +22,22 @@
 
 
 //屏幕长宽
-#define SGL_SCREEN_H 64     //y轴大小
-#define SGL_SCREEN_W 128    //x轴大小
+#define SGL_SCREEN_H 240     //y轴大小
+#define SGL_SCREEN_W 240    //x轴大小
 
 
-#define DEBUG_ENABLE 0//开启日志打印功能,1则开启,在32行的宏替换中加入自己printf函数
+#define DEBUG_ENABLE  0 //开启日志打印功能,1则开启,在32行的宏替换中加入自己printf函数
 
 /* 如果开启,则添加自己的printf函数 */
-#if DEBUG_ENABLE
 #define sgl_log debug_printf
-#endif
+
+/* 定义刷新率,单位是帧 */
+#define SGL_FPS 100  
 
 /* 色深设置,单位是bit */
-#define Color_depth 1
+#define Color_depth 16
+
+
 
 /* 单色屏幕由于硬件限制,没法局部刷新,所以必须需要一个屏幕缓冲的 */
 #if Color_depth==1
@@ -45,8 +49,8 @@
 
 /* 16位色的屏幕 */
 #if Color_depth==16
-/* 为屏幕存放多少行缓冲 */
-#define SGL_LOACL_BUF_RATING SGL_SCREEN_H/2
+/* 为屏幕存放多少行缓冲,最大是一个屏幕的高度-->SGL_SCREEN_W */
+#define SGL_LOACL_BUF_RATING 80
 /* 屏幕所需要的缓冲 */
 #define SGL_BUF_SIZE SGL_LOACL_BUF_RATING*SGL_SCREEN_W*2//乘上2是因为一个像素点两个字节
 #endif
@@ -57,10 +61,10 @@
 #define sgl_get_Timestamp get_tick
 
 /* 添加一个内存申请函数,默认使用malloc */
-#define sig_malloc malloc
+#define sgl_malloc malloc
 
 /* 添加一个内存释放函数,默认是free */
-#define sig_free free
+#define sgl_free free
 
 void sgl_init(void);
 void sgl_run(void);

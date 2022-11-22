@@ -19,7 +19,7 @@ void sgl_obj_init(void)
 /* 创造对象 */
 sgl_obj_t* sgl_obj_create(sgl_obj_t* f_obj, void(*draw_method)(void*))
 {
-    sgl_obj_t* p_obj = (sgl_obj_t*)sig_malloc(sizeof(sgl_obj_t));
+    sgl_obj_t* p_obj = (sgl_obj_t*)sgl_malloc(sizeof(sgl_obj_t));
     sgl_obj_t* ptr = (sgl_obj_t*)&sgl_obj_root;
 
     if(p_obj == NULL)//内存申请失败
@@ -80,7 +80,7 @@ void sgl_obj_remove(sgl_obj_t* obj)
         if(p == obj)//如果是当前的对象,则直接释放
         {
             pre->next_obj = p->next_obj;//改变前一个节点的指针,指向下一个节点
-            sig_free(p);//释放内存
+            sgl_free(p);//释放内存
             sgl_obj_sum--;//总对象减少1个
             return;//退出函数
         }
