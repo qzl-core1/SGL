@@ -21,16 +21,17 @@ sgl_obj_t* sgl_obj_create(sgl_obj_t* f_obj, void(*draw_method)(void*))
 {
     sgl_obj_t* p_obj = (sgl_obj_t*)sig_malloc(sizeof(sgl_obj_t));
     sgl_obj_t* ptr = (sgl_obj_t*)&sgl_obj_root;
+
     if(p_obj == NULL)//内存申请失败
     {
         /* 加入DEBUG函数 */
         #if DEBUG_ENABLE
-        log_printf("obj malloc fail-----sgl_obj_create\r\n");
+        sgl_log("obj malloc fail-----sgl_obj_create\r\n");
         #endif
         return NULL;
     }
-    
-    memset(p_obj,0,sizeof(sgl_obj_t));
+
+    memset(p_obj, 0, sizeof(sgl_obj_t));
 
     if(f_obj == NULL)//父对象为空,默认使用屏幕当作父对象
     {
@@ -65,7 +66,7 @@ void sgl_obj_remove(sgl_obj_t* obj)
     {
         /* 加入DEBUG函数 */
         #if DEBUG_ENABLE
-        log_printf("obj is not exist-----sgl_obj_remove\r\n");
+        sgl_log("obj is not exist-----sgl_obj_remove\r\n");
         #endif
         return;
     }
@@ -96,7 +97,7 @@ void sgl_obj_set_size(sgl_obj_t* obj, int16_t height, int16_t width)
     {
         /* 加入DEBUG函数 */
         #if DEBUG_ENABLE
-        log_printf("obj is not exist-----sgl_obj_set_size\r\n");
+        sgl_log("obj is not exist-----sgl_obj_set_size\r\n");
         #endif
         return;
     }
@@ -112,7 +113,7 @@ void sgl_obj_set_pos(sgl_obj_t* obj, int16_t x, int16_t y)
     {
         /* 加入DEBUG函数 */
         #if DEBUG_ENABLE
-        log_printf("obj is not exist-----sgl_obj_set_pos\r\n");
+        sgl_log("obj is not exist-----sgl_obj_set_pos\r\n");
         #endif
         return;
     }
@@ -128,7 +129,7 @@ void sgl_obj_set_features(sgl_obj_t* obj, void* features)
     {
         /* 加入DEBUG函数 */
         #if DEBUG_ENABLE
-        log_printf("obj is not exist-----sgl_obj_set_features\r\n");
+        sgl_log("obj is not exist-----sgl_obj_set_features\r\n");
         #endif
         return;
     }
@@ -144,7 +145,7 @@ int sgl_obj_get_sum(void)
 
 
 /* 对象链表遍历设置 */
-void sgl_obj_handle(void)
+void sgl_obj_run(void)
 {
     sgl_obj_t *p = (sgl_obj_t *)sgl_obj_root.next_obj;
 
@@ -159,6 +160,6 @@ void sgl_obj_handle(void)
     }
 
     #if DEBUG_ENABLE
-    log_printf("obj sum :%d-----sgl_obj_handle\r\n", sgl_obj_sum);
+    sgl_log("obj sum :%d-----sgl_obj_handle\r\n", sgl_obj_sum);
     #endif
 }

@@ -24,13 +24,34 @@
 #define SGL_SCREEN_H 64     //y轴大小
 #define SGL_SCREEN_W 128    //x轴大小
 
-#define SGL_SCREEN_SIZE SGL_SCREEN_H*SGL_SCREEN_W/8
 
-#define DEBUG_ENABLE 1//开启日志打印功能,1则开启,在32行的宏替换中加入自己printf函数
+#define DEBUG_ENABLE 0//开启日志打印功能,1则开启,在32行的宏替换中加入自己printf函数
 
+/* 如果开启,则添加自己的printf函数 */
 #if DEBUG_ENABLE
-#define log_printf debug_printf
+#define sgl_log debug_printf
 #endif
+
+/* 色深设置,单位是bit */
+#define Color_depth 1
+
+/* 单色屏幕由于硬件限制,没法局部刷新,所以必须需要一个屏幕缓冲的 */
+#if Color_depth==1
+/* 为屏幕存放多少行缓冲 */
+#define SGL_LOACL_BUF_RATING SGL_SCREEN_H
+/* 屏幕所需要的缓冲 */
+#define SGL_BUF_SIZE SGL_LOACL_BUF_RATING*SGL_SCREEN_W/8 //除8是因为一个像素才一个Bit
+#endif
+
+/* 16位色的屏幕 */
+#if Color_depth==16
+/* 为屏幕存放多少行缓冲 */
+#define SGL_LOACL_BUF_RATING SGL_SCREEN_H/2
+/* 屏幕所需要的缓冲 */
+#define SGL_BUF_SIZE SGL_LOACL_BUF_RATING*SGL_SCREEN_W*2//乘上2是因为一个像素点两个字节
+#endif
+
+
 
 /* 添加一个获取时间戳的函数 */
 #define sgl_get_Timestamp get_tick
@@ -42,7 +63,7 @@
 #define sig_free free
 
 void sgl_init(void);
-void sgl_handle(void);
-uint32_t sgl_tick_stampe(uint32_t pre_tick);
+void sgl_run(void);
+uint32_t sgl_tick_stampe_interval(uint32_t pre_tick);
 
 #endif
